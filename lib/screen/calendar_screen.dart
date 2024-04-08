@@ -3,8 +3,10 @@ import 'package:flutter/services.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter/src/widgets/placeholder.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:get/get.dart';
 import 'package:skin_care_diary/module/calendar/calendar_chart.dart';
 import 'package:skin_care_diary/module/home/honeXAI.dart';
+import 'package:skin_care_diary/store/get_calendar.dart';
 import 'package:skin_care_diary/theme.dart';
 import 'package:skin_care_diary/widget/header/header_icon.dart';
 
@@ -41,10 +43,7 @@ class CalendarScreen extends StatelessWidget {
                 children: [
                   const HomeXAI(),
                   const SizedBox(height: 20),
-                  const SizedBox(
-                    height: 200,
-                    child: CalendarChart(),
-                  ),
+                  CalendarChart(),
                   const SizedBox(height: 20),
                   // Text(
                   //   'XAI피부설명',
@@ -81,17 +80,24 @@ class CalendarScreen extends StatelessWidget {
             child: Container(
               alignment: Alignment.center,
               child: Container(
-                width: 110,
+                width: screenWidth * 0.3,
                 height: 170,
                 child: Stack(
                   children: [
-                    SvgPicture.asset(AssetsImg.iconDrop),
+                    SvgPicture.asset(
+                      AssetsImg.iconDrop,
+                      width: double.infinity,
+                    ),
                     Positioned(
-                      bottom: 10,
-                      left: 10,
-                      child: CircleAvatar(
-                        radius: 45,
-                        backgroundImage: NetworkImage(userImg),
+                      bottom: 0,
+                      left: 0,
+                      child: Container(
+                        padding: const EdgeInsets.all(10),
+                        width: screenWidth * 0.3,
+                        child: CircleAvatar(
+                          radius: screenWidth * 0.1,
+                          backgroundImage: NetworkImage(userImg),
+                        ),
                       ),
                     ),
                   ],
@@ -102,21 +108,30 @@ class CalendarScreen extends StatelessWidget {
           Expanded(
             child: Column(
               children: [
-                _buildUserInfoText(
-                  title: '피부 건강',
-                  num: 86,
-                ),
-                _buildUserInfoText(
-                  title: '실제 나이',
-                  num: 28,
-                ),
-                const SizedBox(height: 10),
-                Text(
-                  '실제 나이 : $userAge',
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 15,
-                  ),
+                GetX<PerCentController>(
+                  init: PerCentController(),
+                  builder: (controller) {
+                    return Column(
+                      children: [
+                        _buildUserInfoText(
+                          title: '피부 건강',
+                          num: controller.healthy.value,
+                        ),
+                        _buildUserInfoText(
+                          title: '실제 나이',
+                          num: controller.age.value,
+                        ),
+                        // const SizedBox(height: 10),
+                        // Text(
+                        //   '실제 나이 : $userAge',
+                        //   style: const TextStyle(
+                        //     color: Colors.white,
+                        //     fontSize: 15,
+                        //   ),
+                        // ),
+                      ],
+                    );
+                  },
                 ),
               ],
             ),

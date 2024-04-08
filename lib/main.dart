@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:get/get.dart';
 import 'package:skin_care_diary/module/home/home_observer.dart';
 import 'package:skin_care_diary/navigation/tab_navigation.dart';
 import 'package:skin_care_diary/routes.dart';
@@ -18,13 +19,15 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      // title: 'Flutter Demo',
-      theme: appTheme,
-      debugShowCheckedModeBanner: false,
-      // home: MyHomePage(),
-      routes: routes,
-      home: const IntroScreen(),
+    return GetMaterialApp(
+      home: MaterialApp(
+        // title: 'Flutter Demo',
+        theme: appTheme,
+        debugShowCheckedModeBanner: false,
+        // home: MyHomePage(),
+        routes: routes,
+        home: const IntroScreen(),
+      ),
     );
   }
 }

@@ -1,10 +1,14 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter/src/widgets/placeholder.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:get/get.dart';
 import 'package:skin_care_diary/models/common_model.dart';
 import 'package:skin_care_diary/navigation/tab_navigation.dart';
+import 'package:skin_care_diary/store/get_calendar.dart';
 import 'package:skin_care_diary/theme.dart';
 import 'package:skin_care_diary/widget/chart/line_pie_chart.dart';
 import 'package:skin_care_diary/widget/header/header_icon.dart';
@@ -45,15 +49,26 @@ class IntroScreen extends StatelessWidget {
         child: SafeArea(
           child: Padding(
             padding: const EdgeInsets.all(20),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                _buildSummary(),
-                const SizedBox(height: 20),
-                _buildCharts(),
-                const SizedBox(height: 20),
-                _buildIntroButton(context),
-              ],
+            child: GetX<PerCentController>(
+              init: PerCentController(), // 컨트롤러 초기화
+              builder: (controller) {
+                return Column(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    _buildSummary(
+                      healthy: controller.healthy.value,
+                      age: controller.age.value,
+                    ),
+                    const SizedBox(height: 20),
+                    _buildCharts(
+                      context: context,
+                      list: controller.list,
+                    ),
+                    const SizedBox(height: 20),
+                    _buildIntroButton(context),
+                  ],
+                );
+              },
             ),
           ),
         ),
@@ -100,60 +115,69 @@ class IntroScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildCharts() {
-    List<PercentModel> list = [
-      PercentModel(
-        percent: 0.80,
-        title: '잡티',
-        color: 0xFF31B0D3,
-      ),
-      PercentModel(
-        percent: 0.92,
-        title: '주름',
-        color: 0xFF9DCB7A,
-      ),
-      PercentModel(
-        percent: 0.85,
-        title: '피부결',
-        color: 0xFFC392C7,
-      ),
-      PercentModel(
-        percent: 0.87,
-        title: '다크서클',
-        color: 0xFFE69A88,
-      ),
-    ];
+  Widget _buildCharts({
+    required BuildContext context,
+    required List<PercentModel> list,
+  }) {
+    double screenWidth = MediaQuery.of(context).size.width;
+    double radius = screenWidth * 0.11;
+
+    // List<PercentModel> list = [
+    //   PercentModel(
+    //     percent: 0.80,
+    //     title: '잡티',
+    //     color: 0xFF31B0D3,
+    //   ),
+    //   PercentModel(
+    //     percent: 0.92,
+    //     title: '주름',
+    //     color: 0xFF9DCB7A,
+    //   ),
+    //   PercentModel(
+    //     percent: 0.85,
+    //     title: '피부결',
+    //     color: 0xFFC392C7,
+    //   ),
+    //   PercentModel(
+    //     percent: 0.87,
+    //     title: '다크서클',
+    //     color: 0xFFE69A88,
+    //   ),
+    // ];
+
     return Wrap(
-      children: [
-        Padding(
+      children: list.map((model) {
+        return Padding(
           padding: const EdgeInsets.only(
             left: 7,
             right: 7,
           ),
           child: Column(
             children: [
-              Container(
-                width: 59.0,
-                height: 59.0,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  border: Border.all(
-                    color: Color(0xFFD64B74), // 테두리 색상 지정
-                    width: 3.0, // 테두리 두께 지정
+              CustomPaint(
+                size: Size(radius, radius),
+                painter: LinePieChartPainter(
+                  percentages: [model.percent ?? 0], // 백분율 값 (0.0 ~ 1.0)
+                  textStyle: TextStyle(
+                    color: Colors.white,
+                    fontSize: radius * 0.5,
+                    fontWeight: FontWeight.w500,
+                    shadows: [
+                      Shadow(
+                        color: Colors.black.withOpacity(0.6),
+                        offset: Offset(0, 2),
+                        blurRadius: 2,
+                      ),
+                    ],
                   ),
-                ),
-                child: CircleAvatar(
-                  backgroundColor: Color(0xFFFFC3D3).withOpacity(0.6),
-                  child: SvgPicture.asset(
-                    AssetsImg.iconFace,
-                    width: 35,
-                    height: 35,
-                  ),
+                  colors: model.color != null
+                      ? [Color(model.color!)]
+                      : [Color(0xFF31B0D3)], // 각 섹션의 색상
                 ),
               ),
               const SizedBox(height: 5),
-              const Text(
-                '모두',
+              Text(
+                model.title ?? '',
                 style: const TextStyle(
                   fontSize: 13,
                   color: Colors.white,
@@ -161,64 +185,24 @@ class IntroScreen extends StatelessWidget {
               ),
             ],
           ),
-        ),
-        ...list
-            .map(
-              (e) => Padding(
-                padding: const EdgeInsets.only(
-                  left: 7,
-                  right: 7,
-                ),
-                child: Column(
-                  children: [
-                    CustomPaint(
-                      size: const Size(56, 56),
-                      painter: LinePieChartPainter(
-                        percentages: [e.percent ?? 0], // 백분율 값 (0.0 ~ 1.0)
-                        textStyle: TextStyle(
-                          color: Colors.white,
-                          fontSize: 24,
-                          fontWeight: FontWeight.w500,
-                          shadows: [
-                            Shadow(
-                              color: Colors.black.withOpacity(0.6),
-                              offset: Offset(0, 2),
-                              blurRadius: 2,
-                            ),
-                          ],
-                        ),
-                        colors: e.color != null
-                            ? [Color(e.color!)]
-                            : [Color(0xFF31B0D3)], // 각 섹션의 색상
-                      ),
-                    ),
-                    const SizedBox(height: 5),
-                    Text(
-                      e.title ?? '',
-                      style: const TextStyle(
-                        fontSize: 13,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            )
-            .toList(),
-      ],
+        );
+      }).toList(),
     );
   }
 
-  Widget _buildSummary() {
+  Widget _buildSummary({
+    required int healthy,
+    required int age,
+  }) {
     return Column(
       children: [
         _buildSummaryText(
           title: '피부 건강',
-          score: 86,
+          score: healthy,
         ),
         _buildSummaryText(
           title: '피부 나이',
-          score: 23,
+          score: age,
         )
       ],
     );

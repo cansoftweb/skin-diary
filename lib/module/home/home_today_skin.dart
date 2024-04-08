@@ -1,8 +1,12 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter/src/widgets/placeholder.dart';
 import 'package:flutter/widgets.dart';
+import 'package:get/get.dart';
 import 'package:skin_care_diary/models/common_model.dart';
+import 'package:skin_care_diary/store/get_calendar.dart';
 import 'package:skin_care_diary/theme.dart';
 
 class HomeTodaySkin extends StatelessWidget {
@@ -46,6 +50,7 @@ class HomeTodaySkin extends StatelessWidget {
   Widget _buildBarChart({
     required String title,
     required double per,
+    required int color,
   }) {
     return Padding(
       padding: const EdgeInsets.only(
@@ -76,8 +81,8 @@ class HomeTodaySkin extends StatelessWidget {
               child: FractionallySizedBox(
                 widthFactor: per,
                 child: Container(
-                  decoration: const BoxDecoration(
-                    color: Color(0xFFFFC3D3),
+                  decoration: BoxDecoration(
+                    color: Color(color),
                     borderRadius: BorderRadius.all(Radius.circular(10)),
                   ),
                 ),
@@ -117,13 +122,48 @@ class HomeTodaySkin extends StatelessWidget {
         color: 0xFFE69A88,
       ),
     ];
-    return Column(
-      children: list
-          .map((e) => _buildBarChart(
-                title: e.title ?? '',
-                per: e.percent ?? 0,
-              ))
-          .toList(),
+
+    // 랜덤한 퍼센트 값을 생성하는 함수
+    List<PercentModel> generateRandomPercentValues() {
+      Random random = Random();
+      List<PercentModel> randomList = [];
+
+      for (var item in list) {
+        double randomPercent =
+            random.nextDouble(); // 0.0부터 1.0까지의 랜덤한 double 값 생성
+        randomList.add(PercentModel(
+          percent: randomPercent,
+          title: item.title,
+          color: item.color,
+        ));
+      }
+
+      return randomList;
+    }
+
+    List<PercentModel> randomList = generateRandomPercentValues();
+
+    return GetX<PerCentController>(
+      init: PerCentController(), // 컨트롤러 초기화
+      builder: (controller) {
+        return Column(
+          children: controller.list
+              .map((e) => _buildBarChart(
+                  title: e.title ?? '',
+                  per: e.percent ?? 0,
+                  color: e.color ?? 0xFFE69A88))
+              .toList(),
+        );
+      },
     );
+
+    // return Column(
+    //   children: randomList
+    //       .map((e) => _buildBarChart(
+    //           title: e.title ?? '',
+    //           per: e.percent ?? 0,
+    //           color: e.color ?? 0xFFE69A88))
+    //       .toList(),
+    // );
   }
 }

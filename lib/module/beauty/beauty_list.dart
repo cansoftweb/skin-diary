@@ -33,6 +33,28 @@ class _BeautyListState extends State<BeautyList> {
         ),
         ...data.map(
           (e) {
+            if (activeIndex == 0) {
+              return _buildGoods(
+                img:
+                    'https://images.unsplash.com/photo-1617897903246-719242758050?q=80&w=1587&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+                category: '헤어',
+                title: '구달 청귤 비타C 잡티케어 세럼 30ml',
+                subTitle: '비타C 잡티케어 세럼',
+                price: 30310,
+                openDate: '개봉일 : 2024.02.10',
+              );
+            }
+            if (activeIndex == 1) {
+              return _buildGoods(
+                img:
+                    'https://images.unsplash.com/photo-1585945037805-5fd82c2e60b1?q=80&w=1446&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+                category: '스킨케어',
+                title: '라로슈포제 NEW 시카플라스트 밤B5',
+                subTitle: '수분충전',
+                price: 58000,
+                openDate: '개봉일 : 2024.03.23',
+              );
+            }
             return _buildGoods(
               img:
                   'https://images.unsplash.com/photo-1567433517180-d3e56cf7f81e?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTJ8fGNvc21ldGljc3xlbnwwfHwwfHx8MA%3D%3D',

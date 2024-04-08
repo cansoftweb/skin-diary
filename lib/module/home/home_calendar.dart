@@ -3,9 +3,11 @@ import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter/src/widgets/placeholder.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:get/get.dart';
 import 'package:skin_care_diary/models/home_model.dart';
 import 'package:skin_care_diary/module/home/home_cubit.dart';
 import 'package:intl/intl.dart';
+import 'package:skin_care_diary/store/get_calendar.dart';
 
 class HomeCalendar extends StatelessWidget {
   /// {@macro counter_page}
@@ -28,6 +30,7 @@ class HomeWeekCalendar extends StatefulWidget {
 }
 
 class _HomeWeekCalendarState extends State<HomeWeekCalendar> {
+  String activeDate = '13';
   @override
   Widget build(BuildContext context) {
     // 현재 날짜를 가져옵니다.
@@ -91,11 +94,11 @@ class _HomeWeekCalendarState extends State<HomeWeekCalendar> {
         child: Row(
           children: [
             ...weeks.map((e) {
-              debugPrint(e.toString());
+              // debugPrint(e.toString());
               return _buildDateButton(
                 day: e.day ?? '',
                 date: e.date ?? '',
-                active: e.date == '13',
+                active: e.date == activeDate,
               );
             }).toList(),
           ],
@@ -120,6 +123,12 @@ class _HomeWeekCalendarState extends State<HomeWeekCalendar> {
     );
 
     return InkWell(
+      onTap: () {
+        setState(() {
+          activeDate = date;
+        });
+        Get.find<PerCentController>().updateData();
+      },
       child: Container(
         width: 70,
         height: 70,
