@@ -27,14 +27,27 @@ class _HomePhotoState extends State<HomePhoto> {
 
   Future<void> _loadFirstImage() async {
     final directory = await getApplicationDocumentsDirectory();
+    // img 폴더 경로 설정
+    String imgFolderPath = '${directory.path}/img';
+
     final List<FileSystemEntity> files = directory.listSync();
+
+    // img 폴더가 있는지 확인하고 없다면 생성
+    Directory imgFolder = Directory(imgFolderPath);
+    if (!(await imgFolder.exists())) {
+      imgFolder.createSync(recursive: true);
+    }
+
+    List<FileSystemEntity> fileList = imgFolder.listSync();
 
     var filter = files.whereType<File>().toList();
 
-    if (filter.isNotEmpty) {
+    if (fileList.isNotEmpty) {
       // 디렉토리에 파일이 존재하는 경우, 첫 번째 파일을 불러옵니다.
-      _imageFile = File(filter.first.path);
-      setState(() {}); // UI를 갱신하여 이미지를 표시합니다.
+
+      setState(() {
+        _imageFile = File(fileList.first.path);
+      }); // UI를 갱신하여 이미지를 표시합니다.
 
       Get.find<PerCentController>().updateData();
     }
@@ -91,6 +104,7 @@ class _HomePhotoState extends State<HomePhoto> {
             ),
           ),
           const SizedBox(width: 20),
+          if (_imageFile == null) Expanded(child: Container()),
           if (_imageFile != null)
             Expanded(
               child: Container(

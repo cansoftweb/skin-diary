@@ -135,7 +135,8 @@ class _CameraScreenState extends State<CameraScreen> {
 
             // 사진 저장
             final directory = await getApplicationDocumentsDirectory();
-            final imagePath = '${directory.path}/image_${DateTime.now()}.png';
+            final imagePath =
+                '${directory.path}/img/image_${DateTime.now()}.png';
 
             // 모든 파일 삭제
             directory.listSync().forEach((entity) {
